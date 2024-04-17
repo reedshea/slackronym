@@ -18,10 +18,8 @@ slackronym$ sam local invoke SlackronymFunction --event events/event.json
 
 ## Tests
 
-Tests are defined in the `tests` folder in this project. Use PIP to install the test dependencies and run tests.
+Tests are defined in the `tests` folder in this project.
 
 ```bash
-slackronym$ pip install -r tests/requirements.txt --user
-# unit test
-slackronym$ python -m pytest tests/unit -v
+slackronym$ pytest
 ```

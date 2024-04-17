@@ -1,4 +1,5 @@
 import json
+import base64
 from urllib.parse import parse_qs
 
 import pytest
