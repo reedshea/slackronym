@@ -1,6 +1,25 @@
+<p align="center">
+    <img src="logo.jpg" width="150">
+</p>
+
 # slackronym
 
-This project contains source code and supporting files for a serverless application that you can deploy with the SAM CLI. The AWS resources are defined in the `template.yaml` file in this project. 
+Simple AWS Lambda function for looking up acronyms with a Slack `slash` command.
+
+
+## Getting started
+
+To get this Slack integration up and running, you will need to:
+
+1.  Fork this repository
+2.  Add GitHub Actions secrets to your new repository to allow deployment to
+    your AWS environment. See below for more details.
+3.  Update `acronyms.csv` with your organization's acronyms
+4.  Deploy the app to AWS using the included GitHub Actions workflow. There
+    should be a Function URL available in the `slackronym` Lambda function.
+5.  Create and install a Slack app that uses a "slash command" to send requests
+    to that Function URL
+
 
 ## Use the SAM CLI to build and test locally
 
@@ -24,12 +43,13 @@ Tests are defined in the `tests` folder in this project.
 slackronym$ pytest
 ```
 
-
 ## Deploy the sample application using GitHub Actions
 
-* Create a user in AWS IAM. Save the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in GitHub Actions Secrets.
+* Create a user in AWS IAM. Save the `AWS_ACCESS_KEY_ID` and
+`AWS_SECRET_ACCESS_KEY` in GitHub Actions Secrets.
 * Create another GitHub Actions Secret for `AWS_REGION`, like `us-east-1`
-* Attach an IAM policy to the user that is similar to the JSON below (or ideally more tightly scoped):
+* Attach an IAM policy to the user that is similar to the JSON below (or
+ideally more tightly scoped):
 
 ```
 {
