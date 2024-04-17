@@ -1,0 +1,42 @@
+name: Deploy to AWS Lambda
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy AWS Lambda Application 
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v4
+
+    - name: Setup Python 3.12
+      uses: actions/setup-python@v5
+      with: { python-version: 3.12 }
+
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run tests
+      run: pytest
+
+    - name: Set up AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Set up AWS SAM
+      uses: aws-actions/setup-sam@v2
+
+    - name: Build Lambda function
+      run: sam build --parallel
+
+    - name: Deploy to AWS Lambda
+      run: |
+        sam deploy --stack-name slackronym-production --capabilities CAPABILITY_IAM --no-confirm-changeset --no-fail-on-empty-changeset
