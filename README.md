@@ -47,7 +47,6 @@ slackronym$ pytest
 
 * Create a user in AWS IAM. Save the `AWS_ACCESS_KEY_ID` and
 `AWS_SECRET_ACCESS_KEY` in GitHub Actions Secrets.
-* Create another GitHub Actions Secret for `AWS_REGION`, like `us-east-1`
 * Attach an IAM policy to the user that is similar to the JSON below (or
 ideally more tightly scoped):
 
