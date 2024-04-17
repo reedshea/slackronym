@@ -1,72 +1,60 @@
 import json
+from urllib.parse import parse_qs
 
 import pytest
 
-from hello_world import app
+from slackronym import app
 
 
 @pytest.fixture()
 def apigw_event():
-    """ Generates API GW Event"""
+    """ Generates Event"""
 
     return {
-        "body": '{ "test": "body"}',
-        "resource": "/{proxy+}",
-        "requestContext": {
-            "resourceId": "123456",
-            "apiId": "1234567890",
-            "resourcePath": "/{proxy+}",
-            "httpMethod": "POST",
-            "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
-            "accountId": "123456789012",
-            "identity": {
-                "apiKey": "",
-                "userArn": "",
-                "cognitoAuthenticationType": "",
-                "caller": "",
-                "userAgent": "Custom User Agent String",
-                "user": "",
-                "cognitoIdentityPoolId": "",
-                "cognitoIdentityId": "",
-                "cognitoAuthenticationProvider": "",
-                "sourceIp": "127.0.0.1",
-                "accountId": "",
-            },
-            "stage": "prod",
-        },
-        "queryStringParameters": {"foo": "bar"},
+        "version": "2.0",
+        "routeKey": "$default",
+        "rawPath": "/",
+        "rawQueryString": "",
         "headers": {
-            "Via": "1.1 08f323deadbeefa7af34d5feb414ce27.cloudfront.net (CloudFront)",
-            "Accept-Language": "en-US,en;q=0.8",
-            "CloudFront-Is-Desktop-Viewer": "true",
-            "CloudFront-Is-SmartTV-Viewer": "false",
-            "CloudFront-Is-Mobile-Viewer": "false",
-            "X-Forwarded-For": "127.0.0.1, 127.0.0.2",
-            "CloudFront-Viewer-Country": "US",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-            "Upgrade-Insecure-Requests": "1",
-            "X-Forwarded-Port": "443",
-            "Host": "1234567890.execute-api.us-east-1.amazonaws.com",
-            "X-Forwarded-Proto": "https",
-            "X-Amz-Cf-Id": "aaaaaaaaaae3VYQb9jd-nvCd-de396Uhbp027Y2JvkCPNLmGJHqlaA==",
-            "CloudFront-Is-Tablet-Viewer": "false",
-            "Cache-Control": "max-age=0",
-            "User-Agent": "Custom User Agent String",
-            "CloudFront-Forwarded-Proto": "https",
-            "Accept-Encoding": "gzip, deflate, sdch",
+            "content-length": "419",
+            "x-amzn-tls-version": "TLSv1.3",
+            "x-forwarded-proto": "https",
+            "x-forwarded-port": "443",
+            "x-forwarded-for": "127.0.0.1, 127.0.0.2",
+            "accept": "application/json, text/plain, */*",
+            "x-amzn-tls-cipher-suite": "TLS_AES_128_GCM_SHA256",
+            "host": "1234567890.execute-api.us-east-1.amazonaws.com",
+            "content-type": "application/x-www-form-urlencoded",
+            "accept-encoding": "gzip, compress, deflate, br",
+            "user-agent": "axios/1.6.8"
         },
-        "pathParameters": {"proxy": "/examplepath"},
-        "httpMethod": "POST",
-        "stageVariables": {"baz": "qux"},
-        "path": "/examplepath",
-    }
-
+        "requestContext": {
+            "accountId": "anonymous",
+            "apiId": "1234567890",
+            "domainName": "1234567890.execute-api.us-east-1.amazonaws.com",
+            "domainPrefix": "1234567890",
+            "http": {
+                "method": "POST",
+                "path": "/",
+                "protocol": "HTTP/1.1",
+                "sourceIp": "127.0.0.1",
+                "userAgent": "axios/1.6.8"
+            },
+            "requestId": "c6af9ac6-7b61-11e6-9a41-93e8deadbeef",
+            "routeKey": "$default",
+            "stage": "$default"
+        },
+        "body": "dG9rZW49MTIzNDU2Nzg5MHRva2VuJnRlYW1faWQ9dGVhbTEyMyZ0ZWFtX2RvbWFpbj1kZXZlbG9wbWVudCZjaGFubmVsX2lkPWNoYW5uZWwxMjMmY2hhbm5lbF9uYW1lPWNoYW5uZWxfbmFtZTEyMyZ1c2VyX2lkPXVzZXJfaWQxMjMmdXNlcl9uYW1lPXVzZXJuYW1lMTIzJmNvbW1hbmQ9JTJGZXhwbGFpbiZ0ZXh0PWkxOG4mYXBpX2FwcF9pZD1hcHBfaWQxMjMmaXNfZW50ZXJwcmlzZV9pbnN0YWxsPWZhbHNlJnJlc3BvbnNlX3VybD1odHRwcyUzQSUyRiUyRmhvb2tzLnNsYWNrLmNvbSUyRmNvbW1hbmRzJTJGcmVzcG9uc2VfdXJsMTIzJnRyaWdnZXJfaWQ9dHJpZ2dlcl9pZDEyMw==",
+        "isBase64Encoded": True
+        }
 
 def test_lambda_handler(apigw_event):
 
     ret = app.lambda_handler(apigw_event, "")
-    data = json.loads(ret["body"])
 
+    post_data = base64.b64decode(apigw_event['body']).decode()
+    parsed_data = parse_qs(post_data)    
+    
     assert ret["statusCode"] == 200
-    assert "message" in ret["body"]
-    assert data["message"] == "hello world"
+    assert "command" in parsed_data
+    assert parsed_data["command"] == ["/explain"]

@@ -1,7 +1,5 @@
 import json
-
-# import requests
-
+from urllib.parse import parse_qs
 
 def lambda_handler(event, context):
     """Sample pure Lambda function
@@ -20,23 +18,34 @@ def lambda_handler(event, context):
 
     Returns
     ------
-    API Gateway Lambda Proxy Output Format: dict
+    Lambda Function URL Output Format: dict
 
-        Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
     """
+    print('Received event')
+    print(event)
+    json_string = json.dumps(event)
+    print(json_string)
+    
+    try:
+        post_data = event.get('body', '')
+        
+        if event.get('isBase64Encoded', False):
+            import base64
+            post_data = base64.b64decode(post_data).decode('utf-8')
+        
+        parsed_data = parse_qs(post_data)
 
-    # try:
-    #     ip = requests.get("http://checkip.amazonaws.com/")
-    # except requests.RequestException as e:
-    #     # Send some context about this error to Lambda Logs
-    #     print(e)
 
-    #     raise e
+        return {
+            "statusCode": 200,
+            "body": json.dumps(parsed_data)
+        }
 
-    return {
-        "statusCode": 200,
-        "body": json.dumps({
-            "message": "hello world",
-            # "location": ip.text.replace("\n", "")
-        }),
-    }
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'body': json.dumps({
+                'message': 'Error processing form data',
+                'error': str(e)
+            })
+        }
