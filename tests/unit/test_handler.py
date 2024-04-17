@@ -54,8 +54,10 @@ def test_lambda_handler(apigw_event):
     ret = app.lambda_handler(apigw_event, "")
 
     post_data = base64.b64decode(apigw_event['body']).decode()
-    parsed_data = parse_qs(post_data)    
-    
-    assert ret["statusCode"] == 200
+    parsed_data = parse_qs(post_data)
+
     assert "command" in parsed_data
     assert parsed_data["command"] == ["/explain"]
+    
+    assert ret["statusCode"] == 200
+    assert "blocks" in ret["body"]
